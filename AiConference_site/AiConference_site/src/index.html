@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>AIED 2026 · Seoul · Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="css/style.css"/>
+    <!-- Floating Chatbot Widget Styles -->
+    <style>
+        .chat-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 360px;
+            height: 480px;
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #111827;
+            color: #ffffff;
+            padding: 14px 16px;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #f9fafb;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+        /*.message.user {*/
+        /*    background: #2563eb;*/
+        /*    color: #ffffff;*/
+        /*    align-self: flex-end;*/
+        /*    border-bottom-right-radius: 2px;*/
+        /*}*/
+
+        .message.bot {
+            background: #f3f4f6;
+            color: #1f2937;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .chat-input-container {
+            display: flex;
+            border-top: 1px solid #e5e7eb;
+            background: #ffffff;
+        }
+
+        .chat-input {
+            flex: 1;
+            border: none;
+            padding: 14px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .chat-submit {
+            background: #2563eb;
+            color: #ffffff;
+            border: none;
+            padding: 0 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .chat-submit:hover {
+            background: #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+<header class="site-header">
+    <div class="logo-area">
+        <img src="img/conference.jpg" alt="Conference Logo" class="logo"/>
+        <div class="logo-text">
+            <span class="conf-name">AIED 2026</span>
+            <span class="conf-location">Seoul · Republic of Korea</span>
+        </div>
+    </div>
+    <nav class="main-nav">
+        <a href="#">About</a>
+        <a href="#theme">Theme</a>
+        <a href="#tracks">Tracks</a>
+        <a href="#program">Program</a>
+        <a href="#info">Useful Info</a>
+    </nav>
+    <a href="#submit" class="primary-btn">Submit your work</a>
+</header>
+
+<section class="conference">
+    <div class="conference-content">
+        <h1>27th International Conference on AI in Education</h1>
+        <p>
+            AIED 2026 will serve as a vibrant forum for researchers, practitioners, and policymakers
+            to explore and shape the evolving landscape of AI in education.
+        </p>
+        <div class="conference-actions">
+            <a href="#program" class="secondary-btn">Explore schedule</a>
+            <a href="#dates" class="ghost-btn">Conference details</a>
+        </div>
+        <div class="conference-meta">
+            <div class="meta-item">
+                <span class="meta-label">Dates</span>
+                <span class="meta-value">27 Jun – 3 Jul 2026</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Location</span>
+                <span class="meta-value">Coex Center · Seoul</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Theme</span>
+                <span class="meta-value">From Tools to Teammates</span>
+            </div>
+        </div>
+    </div>
+    <div class="conference-image">
+        <img src="img/conference.jpg" alt="Seoul cityscape"/>
+        <div class="conference-caption">
+            <span>Seoul, Republic of Korea</span>
+            <span>Blending centuries-old traditions with modern urban energy.</span>
+        </div>
+    </div>
+</section>
+
+<!-- Ollama Chatbot UI -->
+<div class="chat-widget">
+    <div class="chat-header">
+        <div>AIED 2026 Assistant</div>
+        <select id="chatMode" style="background:#1f2937; color:#ffffff; border:1px solid #374151; border-radius:4px; padding:3px 6px; font-size:12px; margin-top:6px; width:100%; cursor:pointer;">
+            <option value="rag" selected>RAG Llama (Conference Docs)</option>
+            <option value="direct">Direct Llama 3 (General AI)</option>
+
+        </select>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+        <div class="message bot">Hello! How can I help you with AIED 2026 today?</div>
+    </div>
+    <div class="chat-input-container">
+        <label for="chatInput"></label><input type="text" id="chatInput" class="chat-input" placeholder="Ask about the conference..." autocomplete="off"/>
+        <button id="chatSubmit" class="chat-submit">Send</button>
+    </div>
+</div>
+
+<section id="whats-new" class="section section-alt">
+    <div class="section-inner">
+        <h2>What’s New & Important</h2>
+        <div class="cards-grid">
+            <article class="card">
+                <h3>Proceedings available</h3>
+                <p>
+                    The AIED 2026 proceedings are now available. Visit the Program → Proceedings page to access the full content.
+                </p>
+                <a href="#" class="text-link">View proceedings</a>
+            </article>
+            <article class="card">
+                <h3>Interactive & LBR tracks</h3>
+                <p>
+                    The Interactive Event and Late-Breaking Result track schedule has been published. Explore the full programme.
+                </p>
+                <a href="#" class="text-link">See schedule</a>
+            </article>
+            <article class="card">
+                <h3>Local information</h3>
+                <p>
+                    Find details about room layouts, local printing services, and practical information for presenters and attendees.
+                </p>
+                <a href="#" class="text-link">Useful information</a>
+            </article>
+        </div>
+        <p class="section-updated">Updated on June 29, 2026</p>
+    </div>
+</section>
+
+<section id="theme" class="section">
+    <div class="section-inner">
+        <h2>Conference theme</h2>
+        <p class="theme-title">
+            “From Tools To Teammates: Human-AI Synergy For Augmented Learning”
+        </p>
+        <p>
+            AIED is entering a new era in which AI must evolve from simply supporting human learning to enabling richer
+            human–AI collaboration. We welcome research on human and AI agency, collaborative intelligence, human learning
+            and human & AI co-evolving, especially work that reimagines AIED systems not as tools, but as adaptive teammates
+            that complement teachers and learners and help achieve shared educational goals.
+        </p>
+        <a href="#" class="primary-btn">Read Call for Papers</a>
+    </div>
+</section>
+
+<section id="tracks" class="section section-alt">
+    <div class="section-inner">
+        <h2>Core research tracks</h2>
+        <div class="cards-grid">
+            <article class="card">
+                <h3>Advances in AI for learning</h3>
+                <p>
+                    Research on rapidly evolving AI technologies—from generative models to established methods—and their role
+                    in augmenting learning as collaborative teammates.
+                </p>
+                <a href="#" class="text-link">Explore research tracks →</a>
+            </article>
+            <article class="card">
+                <h3>BlueSky track</h3>
+                <p>
+                    Visionary ideas that reimagine how AI may shape learning in the coming decades, beyond incremental
+                    improvements to today’s systems.
+                </p>
+                <a href="#" class="text-link">BlueSky submission details →</a>
+            </article>
+            <article class="card">
+                <h3>WideAIED track</h3>
+                <p>
+                    Global and inclusive perspectives addressing under-represented contexts, equity, accessibility, and diverse
+                    social and technological environments.
+                </p>
+                <a href="#" class="text-link">WideAIED submission details →</a>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section id="program" class="section">
+    <div class="section-inner">
+        <h2>Program & festival</h2>
+        <p>
+            AIED 2026 is organised by The International AI in Education (IAIED) Society and is one of the participating
+            conferences in the Festival of Learning 2026. The program brings together keynotes, paper sessions, interactive
+            events, and community activities.
+        </p>
+        <div class="conference-meta conference-meta-inline">
+            <div class="meta-item">
+                <span class="meta-label">Festival</span>
+                <span class="meta-value">Festival of Learning 2026</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Edition</span>
+                <span class="meta-value">27th AIED Conference</span>
+            </div>
+        </div>
+        <a href="#" class="secondary-btn">View full program</a>
+    </div>
+</section>
+
+<section id="info" class="section section-alt">
+    <div class="section-inner">
+        <h2>Practical information</h2>
+        <ul class="info-list">
+            <li><strong>Venue:</strong> Coex Center, Seoul, Republic of Korea</li>
+            <li><strong>Access:</strong> Convenient subway and airport connections, nearby hotels and restaurants.</li>
+            <li><strong>Support:</strong> On-site help desk, local printing, and technical support for presenters.</li>
+        </ul>
+        <a href="#" class="ghost-btn">Download attendee guide</a>
+    </div>
+</section>
+
+<section id="submit" class="section">
+    <div class="section-inner section-submit">
+        <h2>Submit your work</h2>
+        <p>
+            Share your latest research, systems, and ideas with the AIED community. Submissions are invited across all
+            tracks, including BlueSky and WideAIED.
+        </p>
+        <a href="#" class="primary-btn">Go to submission portal</a>
+    </div>
+</section>
+
+<footer class="site-footer">
+    <div class="footer-inner">
+        <p>
+            IAIED © 2026 · AIED Conference · Seoul, Republic of Korea<br/>
+            Home of the 27th International Conference on Artificial Intelligence in Education, June 29 – July 3, 2026.
+        </p>
+        <nav class="footer-nav">
+            <a href="#">Home</a>
+            <a href="#">Program</a>
+            <a href="#">Proceedings</a>
+            <a href="#">Contact</a>
+        </nav>
+    </div>
+</footer>
+
+<script>
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatSubmit = document.getElementById('chatSubmit');
+    const chatMode = document.getElementById('chatMode');
+
+    // Relative path routing directly to your Flask backend endpoint
+    const BACKEND_API_URL = '/api/chat';
+
+    async function sendMessage() {
+        const text = chatInput.value.trim();
+        const mode = chatMode.value;
+        if (!text) return;
+
+        appendMessage(text, 'user');
+        chatInput.value = '';
+
+        const modeLabel = mode === 'rag' ? 'RAG Database' : 'Direct Llama';
+        const botMessageDiv = appendMessage(`Thinking (${modeLabel})...`, 'bot');
+        chatInput.disabled = true;
+        chatSubmit.disabled = true;
+
+        try {
+            const response = await fetch(BACKEND_API_URL, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    message: text,
+                    mode: mode
+                })
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                botMessageDiv.innerText = data.response;
+            } else {
+                botMessageDiv.innerText = 'Error: ' + (data.error || 'Failed to get a response from AI.');
+            }
+        } catch (error) {
+            console.error(error);
+            botMessageDiv.innerText = 'Error: Make sure your Python backend (python app.py) is running.';
+        } finally {
+            chatInput.disabled = false;
+            chatSubmit.disabled = false;
+            chatInput.focus();
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    }
+
+    function appendMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', sender);
+        messageDiv.innerText = text;
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return messageDiv;
+    }
+
+    chatSubmit.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+
+</script>
+</body>
+</html>
