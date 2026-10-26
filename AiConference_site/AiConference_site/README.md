@@ -6,7 +6,7 @@
 #Currently, project is running in Python code and is running in IntelliJ. HTML is used to create webpages and .css is used to style pages.
 
 #To run project:
-#First change the directory with cd \Users\findl\IdeaProjects\AiConference_site\AiConference_site\src
+#First change the directory with AiConference_site/AiConference_site/src
 #Run command python app.py
 
 #Note: Image taken from https://openverse.org/image/1c9d4ba1-d445-40a0-a40d-700141785a39?q=conference+hall+exterior&p=50 ,which is under the creative commons license.
