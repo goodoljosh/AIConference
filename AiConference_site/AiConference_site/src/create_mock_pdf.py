@@ -1,5 +1,6 @@
 import os
 from fpdf import FPDF
+# File creates template of PDF that is created and populated when project is run
 
 # Ensure the ./data target directory exists
 os.makedirs("./data", exist_ok=True)
