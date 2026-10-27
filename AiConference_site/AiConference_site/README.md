@@ -1,9 +1,12 @@
 # AiConference Site
 # A website commissioned to create an attractive and informative webpage for an upcoming Ai conference.
 
-#Styling based on template of a website, will tailor to customers needs at a future data. Implemented Base LLM/contextLLM and RAG LLM
+#Styling will be accessible colored in 
 
-#Currently, project is running in Python code and is running in IntelliJ. HTML is used to create webpages and .css is used to style pages.
+#Currently, project is running in Python code, Ollama(free instance, running locally), and using two different models. HTML is used to create webpages and .css is used to style pages. 
+#Main.js is reponsible for chatbot prompt receiving and output. 
+#app.py is the frontend hadling the requests for the webpage and AI Chatbot. 
+#index.html is reposnsible for webpage layout
 
 #To run project:
 #First change the directory with AiConference_site/AiConference_site/src
