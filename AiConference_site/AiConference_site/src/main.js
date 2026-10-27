@@ -6,6 +6,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatInput = document.getElementById('chat-input') || document.querySelector('input[type="text"]');
     const chatMessages = document.getElementById('chat-messages') || document.querySelector('.chat-body');
     const sendButton = document.getElementById('send-btn') || document.querySelector('button[type="submit"]');
+    const BACKEND_URL = "https://nastyspookytoad-5000.app.github.dev";
+
+
+    async function sendQuestion(question) {
+        const response = await fetch(`${BACKEND_URL}/ask`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ question: question })
+        });
+        const data = await response.json();
+        console.log(data);
 
     if (!chatInput || !chatMessages) {
         console.error('Chatbot input or messages container not found in DOM.');
