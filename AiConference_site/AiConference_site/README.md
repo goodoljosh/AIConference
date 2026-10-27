@@ -10,3 +10,5 @@
 #Run command python app.py
 
 #Note: Image taken from https://openverse.org/image/1c9d4ba1-d445-40a0-a40d-700141785a39?q=conference+hall+exterior&p=50 ,which is under the creative commons license.
+
+#change port 5000 to public to allow chatbots to work
