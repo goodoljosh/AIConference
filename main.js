@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatSubmit = document.getElementById('chatSubmit');
     const chatMode = document.getElementById('chatMode');
 
-    const BACKEND_API_URL = '/api/chat';
+    const BACKEND_API_URL = 'https://nasty-spooky-toad-7x5qg6vq9qphx54x-5000.app.github.dev/api/chat';
 
     if (!chatInput || !chatMessages || !chatSubmit) {
         console.error('Chatbot elements not found in DOM.');
