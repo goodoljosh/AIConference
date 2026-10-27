@@ -1,119 +1,65 @@
-//Main not needed anymore
 document.addEventListener('DOMContentLoaded', () => {
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatSubmit = document.getElementById('chatSubmit');
+    const chatMode = document.getElementById('chatMode');
 
-    // 1. Select Chatbot UI elements
-    const chatForm = document.getElementById('chat-form') || document.querySelector('form');
-    const chatInput = document.getElementById('chat-input') || document.querySelector('input[type="text"]');
-    const chatMessages = document.getElementById('chat-messages') || document.querySelector('.chat-body');
-    const sendButton = document.getElementById('send-btn') || document.querySelector('button[type="submit"]');
-    const BACKEND_URL = "https://nastyspookytoad-5000.app.github.dev";
+    const BACKEND_API_URL = '/api/chat';
 
-
-    async function sendQuestion(question) {
-        const response = await fetch(`${BACKEND_URL}/ask`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ question: question })
-        });
-        const data = await response.json();
-        console.log(data);
-
-    if (!chatInput || !chatMessages) {
-        console.error('Chatbot input or messages container not found in DOM.');
+    if (!chatInput || !chatMessages || !chatSubmit) {
+        console.error('Chatbot elements not found in DOM.');
         return;
     }
 
-    // 2. Main submit handler
-    async function handleSendMessage(e) {
-        if (e) e.preventDefault();
+    async function sendMessage() {
+        const text = chatInput.value.trim();
+        const mode = chatMode ? chatMode.value : 'rag';
+        if (!text) return;
 
-        const userText = chatInput.value.trim();
-        if (!userText) return;
-
-        // Display User Message in UI
-        appendMessage('user', userText);
+        appendMessage(text, 'user');
         chatInput.value = '';
 
-        // Show "Thinking..." loading placeholder
-        const loadingDiv = appendMessage('ai loading', 'Thinking...');
-
-        // Disable input while awaiting response
-        setLoadingState(true);
+        const modeLabel = mode === 'rag' ? 'RAG Database' : 'Direct Llama';
+        const botMessageDiv = appendMessage(`Thinking (${modeLabel})...`, 'bot');
+        chatInput.disabled = true;
+        chatSubmit.disabled = true;
 
         try {
-            // Relative URL fetch to Flask backend
-            const response = await fetch('/api/chat', {
+            const response = await fetch(BACKEND_API_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ message: userText })
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text, mode: mode })
             });
 
             const data = await response.json();
 
-            // Remove loading indicator
-            if (loadingDiv && loadingDiv.parentNode) {
-                loadingDiv.parentNode.removeChild(loadingDiv);
-            }
-
-            if (response.ok && data.response) {
-                // Display Ollama AI Response
-                appendMessage('ai', data.response);
+            if (response.ok) {
+                botMessageDiv.innerText = data.response;
             } else {
-                // Display Backend Error Message
-                const errorMsg = data.error || 'Failed to get a response from AI.';
-                appendMessage('ai error', `Error: ${errorMsg}`);
+                botMessageDiv.innerText = 'Error: ' + (data.error || 'Failed to get a response.');
             }
-
         } catch (error) {
-            console.error('Fetch error:', error);
-            if (loadingDiv && loadingDiv.parentNode) {
-                loadingDiv.parentNode.removeChild(loadingDiv);
-            }
-            appendMessage('ai error', 'Error: Could not connect to Flask backend. Make sure python app.py is running on http://127.0.0.1:5000.');
+            console.error(error);
+            botMessageDiv.innerText = 'Error: Could not connect to Flask backend.';
         } finally {
-            // Re-enable input controls
-            setLoadingState(false);
+            chatInput.disabled = false;
+            chatSubmit.disabled = false;
             chatInput.focus();
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
     }
 
-    // 3. Helper function to append message elements to the DOM
-    function appendMessage(senderClass, text) {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `message ${senderClass}`;
-
-        const textSpan = document.createElement('span');
-        textSpan.textContent = text;
-        msgDiv.appendChild(textSpan);
-
-        chatMessages.appendChild(msgDiv);
-
-        // Auto-scroll to latest message
+    function appendMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', sender);
+        messageDiv.innerText = text;
+        chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
-
-        return msgDiv;
+        return messageDiv;
     }
 
-    // 4. Helper function to disable/enable inputs
-    function setLoadingState(isLoading) {
-        chatInput.disabled = isLoading;
-        if (sendButton) sendButton.disabled = isLoading;
-    }
-
-    // 5. Attach event listeners
-    if (chatForm && chatForm.tagName === 'FORM') {
-        chatForm.addEventListener('submit', handleSendMessage);
-    } else if (sendButton) {
-        sendButton.addEventListener('click', handleSendMessage);
-    }
-
-    // Allow Enter key submission
-    chatInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSendMessage();
-        }
+    chatSubmit.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendMessage();
     });
 });
