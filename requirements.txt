@@ -1,8 +1,2 @@
-Flask
-flask-cors
-llama-index-core
-llama-index-vector-stores-chroma
-llama-index-readers-file
-llama-index-embeddings-ollama
-llama-index-llms-ollama
-chromadb
+Flask>=3.0.0
+gunicorn>=21.0.0
