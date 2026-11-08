@@ -1,49 +1,45 @@
-from flask import Flask, render_template, request, jsonify
-from flask_cors import CORS
-#import ollama
-from rag_engine import TwoLlamaEngine
+from flask import Flask, request, jsonify, render_template
+import re
 
-#python backend server, responsible for answering pull requests with push requests
+app = Flask(__name__, static_folder='.', static_url_path='')
 
-# static_url_path='' allows serving css/, js/, and img/ directly without needing a /static/ folder prefix
-app = Flask(__name__, static_folder='.', static_url_path='', template_folder='.')
-CORS(app)
-#configures Flask web app and instantiates TwoLlamaEngine when the backend app starts.
-engine = TwoLlamaEngine(data_dir="./data", db_path="./chroma_db")
+# Knowledge base data parser (Replacing heavy RAG LLM)
+KNOWLEDGE_BASE = {
+    "papers": "Paper submissions are open until June 30th. Papers can be submitted via the submission link in the Call for Papers section.",
+    "accommodations": "Conference accommodations are located at the Grand Hyatt Regency at a discounted rate of $179/night.",
+    "pricing": "Registration pricing: Student/Researcher rate is $199, Academic rate is $399, and Industry rate is $699.",
+    "payment": "Payments can be made via credit card, PayPal, or wire transfer through our secure payment links in the Pricing section.",
+    "schedule": "The conference takes place over 3 days, featuring keynote speeches, paper presentation tracks, and workshops."
+}
+
+def parse_data(query: str) -> str:
+    query_lower = query.lower()
+    
+    if any(k in query_lower for k in ["paper", "submit", "call for paper", "author"]):
+        return KNOWLEDGE_BASE["papers"]
+    elif any(k in query_lower for k in ["hotel", "stay", "accommodation", "room", "location"]):
+        return KNOWLEDGE_BASE["accommodations"]
+    elif any(k in query_lower for k in ["price", "cost", "fee", "ticket", "pricing"]):
+        return KNOWLEDGE_BASE["pricing"]
+    elif any(k in query_lower for k in ["pay", "payment", "card", "checkout"]):
+        return KNOWLEDGE_BASE["payment"]
+    elif any(k in query_lower for k in ["schedule", "date", "agenda", "time"]):
+        return KNOWLEDGE_BASE["schedule"]
+    else:
+        return "I can help with information about paper submissions, accommodations, registration pricing, and payments. What would you like to know?"
 
 @app.route('/')
-def home():
-    return render_template('index.html')
+def index():
+    return app.send_static_file('index.html')
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
     data = request.get_json() or {}
     user_message = data.get('message', '')
-#defines /api/chat route and extracts user message and mode selection "rag" or "direct"
-    mode = data.get('mode','rag')
-
-#Validates inputs, routes request to ask_direct() or ask_rag() based on the mode the user has chose and returns output to JSON
-    if not user_message:
-        return jsonify({'error': 'Message cannot be empty'}), 400
-
-    try:
-        # Update 'llama3' to match the model installed on your machine (e.g. 'llama3.2', 'mistral', 'phi3')
-        #old response made a raw call to ollama.chat() directly
-        # response = ollama.chat(
-        #     model='llama3',
-        #     messages=[{'role': 'user', 'content': user_message}]
-        # )
-        # return jsonify({'response': response['message']['content']})
-
-        if mode == 'direct':
-             answer = engine.ask_direct(user_message)
-        else:
-             answer = engine.ask_rag(user_message)
-
-        return jsonify({'response': answer})
-
-    except Exception as e:
-        return jsonify({'error': f"Ollama connection error: {str(e)}"}), 500
+    
+    # Fast deterministic parsing response
+    bot_response = parse_data(user_message)
+    return jsonify({"response": bot_response})
 
 if __name__ == '__main__':
-    app.run(debug=True, host='127.0.0.1', port=5000)
+    app.run(host='0.0.0.0', port=5000, debug=True)
